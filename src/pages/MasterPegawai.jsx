@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
-import { Search, Plus, Edit2, Trash2, Users, Upload, Download, X } from 'lucide-react';
+import { Search, Plus, Edit2, Trash2, Users, X } from 'lucide-react';
 import moment from 'moment';
+import ImportExportBar from '@/components/pegawai/ImportExportBar';
+import { exportToExcel, exportToPDF, exportToWord, importEmployeesFromFile } from '@/utils/exportImport';
 
 export default function MasterPegawai() {
   const { user } = useAuth();
@@ -14,6 +16,7 @@ export default function MasterPegawai() {
   const [filterStatus, setFilterStatus] = useState('all');
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null);
+  const [importing, setImporting] = useState(false);
 
   useEffect(() => {
     load();
@@ -42,6 +45,44 @@ export default function MasterPegawai() {
     });
   }, [employees, search, filterUnit, filterStatus]);
 
+  const handleImport = async (file) => {
+    setImporting(true);
+    try {
+      const imported = await importEmployeesFromFile(file);
+      if (!imported || imported.length === 0) {
+        alert('Tidak ada data yang dapat diimpor dari file tersebut.');
+        return;
+      }
+      const valid = imported.filter(e => e.nama_lengkap && e.nip);
+      if (valid.length === 0) {
+        alert('Data tidak valid. Pastikan file memiliki kolom Nama Lengkap dan NIP.');
+        return;
+      }
+      const withDefaults = valid.map(e => ({
+        ...e,
+        status_asn: e.status_asn || 'PNS',
+        jenis_jabatan: e.jenis_jabatan || 'Pelaksana',
+        status_pegawai: e.status_pegawai || 'Aktif',
+        jumlah_anak: e.jumlah_anak || 0,
+        default_password: '12345678',
+        password_changed: false,
+        deleted: false,
+      }));
+      await base44.entities.Employee.bulkCreate(withDefaults);
+      alert(`${withDefaults.length} pegawai berhasil diimpor.`);
+      load();
+    } catch (e) {
+      alert('Gagal mengimpor: ' + e.message);
+    } finally { setImporting(false); }
+  };
+
+  const handleExport = (format) => {
+    if (filtered.length === 0) { alert('Tidak ada data untuk diekspor.'); return; }
+    if (format === 'excel') exportToExcel(filtered);
+    else if (format === 'pdf') exportToPDF(filtered);
+    else if (format === 'word') exportToWord(filtered);
+  };
+
   const handleDelete = async (id) => {
     if (!confirm('Yakin ingin menonaktifkan pegawai ini? Data tidak akan dihapus permanen.')) return;
     try {
@@ -65,12 +106,15 @@ export default function MasterPegawai() {
           <h1 className="text-2xl lg:text-3xl font-heading font-bold">Master Pegawai</h1>
           <p className="text-muted-foreground mt-1">{filtered.length} pegawai</p>
         </div>
-        <button
-          onClick={() => { setEditing(null); setShowForm(true); }}
-          className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:opacity-90 flex items-center gap-2"
-        >
-          <Plus className="w-4 h-4" /> Tambah Pegawai
-        </button>
+        <div className="flex items-center gap-2 flex-wrap">
+          <ImportExportBar onImport={handleImport} onExport={handleExport} importing={importing} />
+          <button
+            onClick={() => { setEditing(null); setShowForm(true); }}
+            className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:opacity-90 flex items-center gap-2"
+          >
+            <Plus className="w-4 h-4" /> Tambah Pegawai
+          </button>
+        </div>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3">

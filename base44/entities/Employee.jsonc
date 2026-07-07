@@ -133,6 +133,14 @@
     "foto_url": {
       "type": "string"
     },
+    "default_password": {
+      "type": "string",
+      "default": "12345678"
+    },
+    "password_changed": {
+      "type": "boolean",
+      "default": false
+    },
     "deleted": {
       "type": "boolean",
       "default": false

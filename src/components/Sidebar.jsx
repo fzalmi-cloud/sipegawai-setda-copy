@@ -5,7 +5,7 @@ import {
   LayoutDashboard, FileText, FilePlus, Ticket, CheckSquare,
   Users, FolderArchive, TrendingUp, Clock, CalendarDays,
   Award, FileCheck, BarChart3, FileType, Settings, HelpCircle,
-  Building2, ListChecks, Bell, X, DollarSign, Sparkles
+  Building2, ListChecks, Bell, X, DollarSign, Sparkles, UserCog
 } from 'lucide-react';
 
 const menuItems = [
@@ -29,6 +29,7 @@ const menuItems = [
   { to: '/master-layanan', label: 'Master Layanan', icon: FileText, roles: ['super_admin', 'admin_kepegawaian'] },
   { to: '/master-checklist', label: 'Master Checklist', icon: ListChecks, roles: ['super_admin', 'admin_kepegawaian'] },
   { to: '/master-unit', label: 'Master Unit Kerja', icon: Building2, roles: ['super_admin', 'admin_kepegawaian'] },
+  { to: '/pengguna', label: 'Manajemen Pengguna', icon: UserCog, roles: ['super_admin'] },
   { to: '/notifikasi', label: 'Notifikasi', icon: Bell, roles: ['super_admin', 'admin_kepegawaian', 'bendahara', 'operator_biro', 'pegawai', 'pimpinan'] },
   { to: '/pengaturan', label: 'Pengaturan', icon: Settings, roles: ['super_admin', 'admin_kepegawaian'] },
   { to: '/bantuan', label: 'Bantuan / FAQ', icon: HelpCircle, roles: ['super_admin', 'admin_kepegawaian', 'bendahara', 'operator_biro', 'pegawai', 'pimpinan'] },

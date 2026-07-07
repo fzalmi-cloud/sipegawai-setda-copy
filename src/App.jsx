@@ -26,6 +26,7 @@ import TemplateDokumen from '@/pages/TemplateDokumen';
 import MasterLayanan from '@/pages/MasterLayanan';
 import MasterChecklist from '@/pages/MasterChecklist';
 import MasterUnitKerja from '@/pages/MasterUnitKerja';
+import Pengguna from '@/pages/Pengguna';
 import Notifikasi from '@/pages/Notifikasi';
 import Pengaturan from '@/pages/Pengaturan';
 import Bantuan from '@/pages/Bantuan';
@@ -77,6 +78,7 @@ const AuthenticatedApp = () => {
         <Route path="/master-layanan" element={<MasterLayanan />} />
         <Route path="/master-checklist" element={<MasterChecklist />} />
         <Route path="/master-unit" element={<MasterUnitKerja />} />
+        <Route path="/pengguna" element={<Pengguna />} />
         <Route path="/notifikasi" element={<Notifikasi />} />
         <Route path="/pengaturan" element={<Pengaturan />} />
         <Route path="/bantuan" element={<Bantuan />} />

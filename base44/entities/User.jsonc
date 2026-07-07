@@ -28,6 +28,14 @@
     },
     "no_hp": {
       "type": "string"
+    },
+    "default_password": {
+      "type": "string",
+      "default": "12345678"
+    },
+    "password_changed": {
+      "type": "boolean",
+      "default": false
     }
   }
 }
