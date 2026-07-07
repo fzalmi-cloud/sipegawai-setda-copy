@@ -1,0 +1,51 @@
+{
+  "name": "TicketChecklist",
+  "type": "object",
+  "properties": {
+    "ticket_id": {
+      "type": "string"
+    },
+    "nomor_tiket": {
+      "type": "string"
+    },
+    "requirement_id": {
+      "type": "string"
+    },
+    "nama_item": {
+      "type": "string"
+    },
+    "wajib": {
+      "type": "boolean",
+      "default": true
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Belum Diunggah",
+        "Sudah Diunggah",
+        "Sesuai",
+        "Belum Sesuai",
+        "Tidak Wajib",
+        "Perlu Klarifikasi"
+      ],
+      "default": "Belum Diunggah"
+    },
+    "document_id": {
+      "type": "string"
+    },
+    "catatan_verifikator": {
+      "type": "string"
+    },
+    "diverifikasi_oleh": {
+      "type": "string"
+    },
+    "tanggal_verifikasi": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "ticket_id",
+    "nama_item"
+  ]
+}

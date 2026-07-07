@@ -1,0 +1,43 @@
+{
+  "name": "TicketComment",
+  "type": "object",
+  "properties": {
+    "ticket_id": {
+      "type": "string"
+    },
+    "nomor_tiket": {
+      "type": "string"
+    },
+    "user_id": {
+      "type": "string"
+    },
+    "nama_user": {
+      "type": "string"
+    },
+    "role_user": {
+      "type": "string"
+    },
+    "komentar": {
+      "type": "string"
+    },
+    "tipe": {
+      "type": "string",
+      "enum": [
+        "Catatan",
+        "Perbaikan",
+        "Verifikasi",
+        "Persetujuan",
+        "Disposisi"
+      ],
+      "default": "Catatan"
+    },
+    "tanggal": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "ticket_id",
+    "komentar"
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "name": "DocumentTemplate",
+  "type": "object",
+  "properties": {
+    "nama_template": {
+      "type": "string"
+    },
+    "kategori": {
+      "type": "string",
+      "enum": [
+        "Surat Pengantar",
+        "Surat Keterangan",
+        "Surat Usulan",
+        "Nota Dinas",
+        "Berita Acara",
+        "Daftar Hadir",
+        "Checklist",
+        "Tanda Terima",
+        "Laporan"
+      ]
+    },
+    "konten": {
+      "type": "string"
+    },
+    "variabel_tersedia": {
+      "type": "string"
+    },
+    "aktif": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "nama_template",
+    "kategori",
+    "konten"
+  ]
+}

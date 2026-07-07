@@ -1,0 +1,38 @@
+{
+  "name": "TicketStatusHistory",
+  "type": "object",
+  "properties": {
+    "ticket_id": {
+      "type": "string"
+    },
+    "nomor_tiket": {
+      "type": "string"
+    },
+    "status_sebelum": {
+      "type": "string"
+    },
+    "status_sesudah": {
+      "type": "string"
+    },
+    "diubah_oleh": {
+      "type": "string"
+    },
+    "nama_pengubah": {
+      "type": "string"
+    },
+    "role_pengubah": {
+      "type": "string"
+    },
+    "catatan": {
+      "type": "string"
+    },
+    "tanggal": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "ticket_id",
+    "status_sesudah"
+  ]
+}

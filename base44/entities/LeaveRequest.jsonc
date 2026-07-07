@@ -1,0 +1,99 @@
+{
+  "name": "LeaveRequest",
+  "type": "object",
+  "properties": {
+    "employee_id": {
+      "type": "string"
+    },
+    "nama_pegawai": {
+      "type": "string"
+    },
+    "nip_pegawai": {
+      "type": "string"
+    },
+    "unit_id": {
+      "type": "string"
+    },
+    "nama_unit": {
+      "type": "string"
+    },
+    "jenis_cuti": {
+      "type": "string",
+      "enum": [
+        "Cuti Tahunan",
+        "Cuti Besar",
+        "Cuti Sakit",
+        "Cuti Melahirkan",
+        "Cuti Alasan Penting",
+        "Cuti Bersama",
+        "Cuti di Luar Tanggungan Negara"
+      ]
+    },
+    "tanggal_mulai": {
+      "type": "string",
+      "format": "date"
+    },
+    "tanggal_selesai": {
+      "type": "string",
+      "format": "date"
+    },
+    "jumlah_hari": {
+      "type": "number"
+    },
+    "alasan": {
+      "type": "string"
+    },
+    "file_url": {
+      "type": "string"
+    },
+    "nama_file": {
+      "type": "string"
+    },
+    "atasan_langsung": {
+      "type": "string"
+    },
+    "status_atasan": {
+      "type": "string",
+      "enum": [
+        "Menunggu",
+        "Disetujui",
+        "Ditolak"
+      ],
+      "default": "Menunggu"
+    },
+    "catatan_atasan": {
+      "type": "string"
+    },
+    "status_kepegawaian": {
+      "type": "string",
+      "enum": [
+        "Menunggu",
+        "Disetujui",
+        "Ditolak"
+      ],
+      "default": "Menunggu"
+    },
+    "catatan_kepegawaian": {
+      "type": "string"
+    },
+    "no_surat_cuti": {
+      "type": "string"
+    },
+    "ticket_id": {
+      "type": "string"
+    },
+    "diajukan_oleh": {
+      "type": "string"
+    },
+    "tanggal_pengajuan": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "employee_id",
+    "jenis_cuti",
+    "tanggal_mulai",
+    "tanggal_selesai"
+  ]
+}

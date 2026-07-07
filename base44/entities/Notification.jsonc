@@ -1,0 +1,51 @@
+{
+  "name": "Notification",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string"
+    },
+    "ticket_id": {
+      "type": "string"
+    },
+    "nomor_tiket": {
+      "type": "string"
+    },
+    "judul": {
+      "type": "string"
+    },
+    "pesan": {
+      "type": "string"
+    },
+    "tipe": {
+      "type": "string",
+      "enum": [
+        "Tiket Baru",
+        "Perlu Perbaikan",
+        "Verifikasi Selesai",
+        "Persetujuan Pimpinan",
+        "SLA Terlampaui",
+        "Hasil Tersedia",
+        "Pensiun",
+        "KGB",
+        "Naik Pangkat",
+        "Uji Kompetensi",
+        "Cuti",
+        "Umum"
+      ]
+    },
+    "dibaca": {
+      "type": "boolean",
+      "default": false
+    },
+    "tanggal": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "user_id",
+    "judul",
+    "pesan"
+  ]
+}

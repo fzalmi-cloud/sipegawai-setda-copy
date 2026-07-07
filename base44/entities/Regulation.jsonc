@@ -1,0 +1,45 @@
+{
+  "name": "Regulation",
+  "type": "object",
+  "properties": {
+    "judul": {
+      "type": "string"
+    },
+    "nomor": {
+      "type": "string"
+    },
+    "tahun": {
+      "type": "number"
+    },
+    "jenis": {
+      "type": "string",
+      "enum": [
+        "UU",
+        "PP",
+        "Peraturan BKN",
+        "Peraturan Menteri",
+        "Peraturan Daerah",
+        "Peraturan Gubernur",
+        "SOP Internal"
+      ]
+    },
+    "kategori_layanan": {
+      "type": "string"
+    },
+    "ringkasan": {
+      "type": "string"
+    },
+    "url_dokumen": {
+      "type": "string"
+    },
+    "aktif": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "judul",
+    "nomor",
+    "jenis"
+  ]
+}

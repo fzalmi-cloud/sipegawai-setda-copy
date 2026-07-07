@@ -1,0 +1,145 @@
+{
+  "name": "Employee",
+  "type": "object",
+  "properties": {
+    "nama_lengkap": {
+      "type": "string"
+    },
+    "nip": {
+      "type": "string"
+    },
+    "nik": {
+      "type": "string"
+    },
+    "tempat_lahir": {
+      "type": "string"
+    },
+    "tanggal_lahir": {
+      "type": "string",
+      "format": "date"
+    },
+    "jenis_kelamin": {
+      "type": "string",
+      "enum": [
+        "Laki-laki",
+        "Perempuan"
+      ]
+    },
+    "agama": {
+      "type": "string",
+      "enum": [
+        "Islam",
+        "Kristen",
+        "Katolik",
+        "Hindu",
+        "Buddha",
+        "Konghucu"
+      ]
+    },
+    "status_asn": {
+      "type": "string",
+      "enum": [
+        "PNS",
+        "PPPK",
+        "CPNS"
+      ],
+      "default": "PNS"
+    },
+    "unit_id": {
+      "type": "string"
+    },
+    "nama_unit": {
+      "type": "string"
+    },
+    "subbagian": {
+      "type": "string"
+    },
+    "jabatan": {
+      "type": "string"
+    },
+    "jenis_jabatan": {
+      "type": "string",
+      "enum": [
+        "Struktural",
+        "Fungsional",
+        "Pelaksana"
+      ],
+      "default": "Pelaksana"
+    },
+    "pangkat_golongan": {
+      "type": "string"
+    },
+    "tmt_cpns": {
+      "type": "string",
+      "format": "date"
+    },
+    "tmt_pns": {
+      "type": "string",
+      "format": "date"
+    },
+    "tmt_pangkat_terakhir": {
+      "type": "string",
+      "format": "date"
+    },
+    "tmt_jabatan": {
+      "type": "string",
+      "format": "date"
+    },
+    "pendidikan_terakhir": {
+      "type": "string"
+    },
+    "no_hp": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "alamat": {
+      "type": "string"
+    },
+    "status_perkawinan": {
+      "type": "string",
+      "enum": [
+        "Belum Kawin",
+        "Kawin",
+        "Cerai Hidup",
+        "Cerai Mati"
+      ]
+    },
+    "jumlah_anak": {
+      "type": "number",
+      "default": 0
+    },
+    "atasan_langsung": {
+      "type": "string"
+    },
+    "pejabat_penilai": {
+      "type": "string"
+    },
+    "catatan_khusus": {
+      "type": "string"
+    },
+    "status_pegawai": {
+      "type": "string",
+      "enum": [
+        "Aktif",
+        "Pensiun",
+        "Mutasi",
+        "Meninggal",
+        "Berhenti"
+      ],
+      "default": "Aktif"
+    },
+    "foto_url": {
+      "type": "string"
+    },
+    "deleted": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "nama_lengkap",
+    "nip"
+  ]
+}

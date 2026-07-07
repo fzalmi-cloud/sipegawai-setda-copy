@@ -1,0 +1,89 @@
+{
+  "name": "DocumentArchive",
+  "type": "object",
+  "properties": {
+    "employee_id": {
+      "type": "string"
+    },
+    "nama_pegawai": {
+      "type": "string"
+    },
+    "nip_pegawai": {
+      "type": "string"
+    },
+    "nama_dokumen": {
+      "type": "string"
+    },
+    "jenis_dokumen": {
+      "type": "string",
+      "enum": [
+        "SK CPNS",
+        "SK PNS",
+        "SK Pangkat",
+        "SK Jabatan",
+        "SK Pelantikan",
+        "Ijazah",
+        "Transkrip",
+        "Sertifikat Diklat",
+        "Sertifikat Uji Kompetensi",
+        "SKP",
+        "Dokumen Disiplin",
+        "Kartu Keluarga",
+        "KTP",
+        "NPWP",
+        "Taspen",
+        "BPJS",
+        "Surat Nikah",
+        "Akta Anak",
+        "Dokumen Pensiun",
+        "Dokumen Cuti",
+        "Dokumen Layanan Lainnya"
+      ]
+    },
+    "nomor_dokumen": {
+      "type": "string"
+    },
+    "tanggal_dokumen": {
+      "type": "string",
+      "format": "date"
+    },
+    "tanggal_unggah": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "masa_berlaku": {
+      "type": "string",
+      "format": "date"
+    },
+    "file_url": {
+      "type": "string"
+    },
+    "diunggah_oleh": {
+      "type": "string"
+    },
+    "nama_pengunggah": {
+      "type": "string"
+    },
+    "status_validasi": {
+      "type": "string",
+      "enum": [
+        "Belum Diverifikasi",
+        "Terverifikasi",
+        "Ditolak"
+      ],
+      "default": "Belum Diverifikasi"
+    },
+    "catatan_verifikasi": {
+      "type": "string"
+    },
+    "ticket_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "employee_id",
+    "nama_dokumen",
+    "jenis_dokumen",
+    "file_url"
+  ]
+}

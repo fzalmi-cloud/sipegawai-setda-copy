@@ -1,0 +1,57 @@
+{
+  "name": "Service",
+  "type": "object",
+  "properties": {
+    "nama_layanan": {
+      "type": "string"
+    },
+    "kategori": {
+      "type": "string",
+      "enum": [
+        "Pensiun",
+        "Kenaikan Pangkat",
+        "Jabatan Fungsional",
+        "Pelantikan",
+        "Cuti",
+        "Mutasi",
+        "Data Kepegawaian",
+        "Surat Keterangan",
+        "KGB",
+        "Disiplin",
+        "Pengembangan Kompetensi",
+        "Lainnya"
+      ]
+    },
+    "kode_layanan": {
+      "type": "string"
+    },
+    "deskripsi": {
+      "type": "string"
+    },
+    "estimasi_waktu": {
+      "type": "string"
+    },
+    "sla_hari": {
+      "type": "number",
+      "default": 3
+    },
+    "alur_layanan": {
+      "type": "string"
+    },
+    "dasar_hukum": {
+      "type": "string"
+    },
+    "aktif": {
+      "type": "boolean",
+      "default": true
+    },
+    "urutan": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "nama_layanan",
+    "kategori"
+  ]
+}

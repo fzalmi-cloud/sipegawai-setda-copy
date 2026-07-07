@@ -1,0 +1,55 @@
+{
+  "name": "TicketDocument",
+  "type": "object",
+  "properties": {
+    "ticket_id": {
+      "type": "string"
+    },
+    "nomor_tiket": {
+      "type": "string"
+    },
+    "requirement_id": {
+      "type": "string"
+    },
+    "nama_item": {
+      "type": "string"
+    },
+    "file_url": {
+      "type": "string"
+    },
+    "nama_file": {
+      "type": "string"
+    },
+    "ukuran_file": {
+      "type": "number"
+    },
+    "diunggah_oleh": {
+      "type": "string"
+    },
+    "nama_pengunggah": {
+      "type": "string"
+    },
+    "tanggal_unggah": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "status_validasi": {
+      "type": "string",
+      "enum": [
+        "Belum Diverifikasi",
+        "Sesuai",
+        "Belum Sesuai",
+        "Perlu Klarifikasi"
+      ],
+      "default": "Belum Diverifikasi"
+    },
+    "catatan_verifikator": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "ticket_id",
+    "file_url",
+    "nama_file"
+  ]
+}

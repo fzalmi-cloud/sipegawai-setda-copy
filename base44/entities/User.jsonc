@@ -1,0 +1,33 @@
+{
+  "name": "User",
+  "type": "object",
+  "properties": {
+    "role": {
+      "type": "string",
+      "enum": [
+        "super_admin",
+        "admin_kepegawaian",
+        "bendahara",
+        "operator_biro",
+        "pegawai",
+        "pimpinan"
+      ],
+      "default": "pegawai"
+    },
+    "nip": {
+      "type": "string"
+    },
+    "unit_id": {
+      "type": "string"
+    },
+    "nama_unit": {
+      "type": "string"
+    },
+    "jabatan": {
+      "type": "string"
+    },
+    "no_hp": {
+      "type": "string"
+    }
+  }
+}

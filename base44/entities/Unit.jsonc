@@ -1,0 +1,34 @@
+{
+  "name": "Unit",
+  "type": "object",
+  "properties": {
+    "nama_unit": {
+      "type": "string"
+    },
+    "kode_unit": {
+      "type": "string"
+    },
+    "jenis": {
+      "type": "string",
+      "enum": [
+        "Unsur Pimpinan",
+        "Biro"
+      ],
+      "default": "Biro"
+    },
+    "urutan": {
+      "type": "number",
+      "default": 0
+    },
+    "aktif": {
+      "type": "boolean",
+      "default": true
+    },
+    "keterangan": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "nama_unit"
+  ]
+}

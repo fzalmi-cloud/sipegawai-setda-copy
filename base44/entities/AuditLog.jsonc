@@ -1,0 +1,38 @@
+{
+  "name": "AuditLog",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string"
+    },
+    "nama_user": {
+      "type": "string"
+    },
+    "role_user": {
+      "type": "string"
+    },
+    "aksi": {
+      "type": "string"
+    },
+    "modul": {
+      "type": "string"
+    },
+    "entity_id": {
+      "type": "string"
+    },
+    "detail": {
+      "type": "string"
+    },
+    "ip_address": {
+      "type": "string"
+    },
+    "tanggal": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "aksi",
+    "modul"
+  ]
+}

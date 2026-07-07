@@ -1,0 +1,114 @@
+{
+  "name": "ServiceTicket",
+  "type": "object",
+  "properties": {
+    "nomor_tiket": {
+      "type": "string"
+    },
+    "employee_id": {
+      "type": "string"
+    },
+    "nama_pegawai": {
+      "type": "string"
+    },
+    "nip_pegawai": {
+      "type": "string"
+    },
+    "unit_id": {
+      "type": "string"
+    },
+    "nama_unit": {
+      "type": "string"
+    },
+    "service_id": {
+      "type": "string"
+    },
+    "nama_layanan": {
+      "type": "string"
+    },
+    "kategori_layanan": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Draft",
+        "Dikirim Pemohon",
+        "Diterima Operator Biro",
+        "Diteruskan ke Kepegawaian Setda",
+        "Verifikasi Awal",
+        "Perlu Perbaikan",
+        "Perbaikan Dikirim",
+        "Verifikasi Lanjutan",
+        "Menunggu Persetujuan Pimpinan",
+        "Disetujui Pimpinan",
+        "Siap Diteruskan ke BKD/BKN",
+        "Dalam Proses Eksternal",
+        "Hasil Diterima",
+        "Selesai",
+        "Ditolak",
+        "Dibatalkan"
+      ],
+      "default": "Draft"
+    },
+    "diajukan_oleh": {
+      "type": "string"
+    },
+    "nama_pengaju": {
+      "type": "string"
+    },
+    "role_pengaju": {
+      "type": "string"
+    },
+    "petugas_id": {
+      "type": "string"
+    },
+    "nama_petugas": {
+      "type": "string"
+    },
+    "tanggal_pengajuan": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "tanggal_selesai": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "batas_waktu_sla": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "persentase_kelengkapan": {
+      "type": "number",
+      "default": 0
+    },
+    "catatan_verifikasi": {
+      "type": "string"
+    },
+    "catatan_perbaikan": {
+      "type": "string"
+    },
+    "prioritas": {
+      "type": "string",
+      "enum": [
+        "Normal",
+        "Tinggi",
+        "Urgent"
+      ],
+      "default": "Normal"
+    },
+    "terlambat_sla": {
+      "type": "boolean",
+      "default": false
+    },
+    "deleted": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "employee_id",
+    "service_id",
+    "status"
+  ]
+}

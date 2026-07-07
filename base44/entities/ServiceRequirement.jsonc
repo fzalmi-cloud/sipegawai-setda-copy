@@ -1,0 +1,53 @@
+{
+  "name": "ServiceRequirement",
+  "type": "object",
+  "properties": {
+    "service_id": {
+      "type": "string"
+    },
+    "nama_layanan": {
+      "type": "string"
+    },
+    "nama_item": {
+      "type": "string"
+    },
+    "wajib": {
+      "type": "boolean",
+      "default": true
+    },
+    "format_diterima": {
+      "type": "string",
+      "enum": [
+        "PDF",
+        "JPG",
+        "PNG",
+        "DOCX",
+        "XLSX",
+        "Semua Format"
+      ],
+      "default": "PDF"
+    },
+    "max_ukuran_mb": {
+      "type": "number",
+      "default": 5
+    },
+    "keterangan": {
+      "type": "string"
+    },
+    "dasar_hukum": {
+      "type": "string"
+    },
+    "urutan": {
+      "type": "number",
+      "default": 0
+    },
+    "aktif": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "service_id",
+    "nama_item"
+  ]
+}
