@@ -2,7 +2,23 @@ import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Upload, Check, ChevronRight, ChevronLeft, User, FileText, Send, AlertCircle, CheckCircle2, X } from 'lucide-react';
+import { Upload, Check, ChevronRight, ChevronLeft, User, FileText, Send, AlertCircle, CheckCircle2, X, FolderArchive, ExternalLink } from 'lucide-react';
+
+const findMatchingArchive = (req, archives) => {
+  const namaItem = (req.nama_item || '').toLowerCase().trim();
+  if (!namaItem || archives.length === 0) return null;
+  const sorted = [...archives].sort((a, b) => {
+    if (a.status_validasi === 'Terverifikasi' && b.status_validasi !== 'Terverifikasi') return -1;
+    if (b.status_validasi === 'Terverifikasi' && a.status_validasi !== 'Terverifikasi') return 1;
+    return new Date(b.tanggal_unggah || 0) - new Date(a.tanggal_unggah || 0);
+  });
+  return sorted.find(a => {
+    const jenis = (a.jenis_dokumen || '').toLowerCase();
+    const namaDoc = (a.nama_dokumen || '').toLowerCase();
+    if (!jenis) return false;
+    return namaItem.includes(jenis) || (namaDoc.length > 3 && namaItem.includes(namaDoc));
+  });
+};
 
 export default function AjukanLayanan() {
   const { user } = useAuth();
@@ -21,6 +37,7 @@ export default function AjukanLayanan() {
   const [selectedSvc, setSelectedSvc] = useState(null);
   const [empSearch, setEmpSearch] = useState('');
   const [uploadedDocs, setUploadedDocs] = useState({});
+  const [empArchives, setEmpArchives] = useState([]);
 
   useEffect(() => {
     const load = async () => {
@@ -91,6 +108,38 @@ export default function AjukanLayanan() {
       return copy;
     });
   };
+
+  const handleUseFromArchive = (reqId, archiveDoc) => {
+    setUploadedDocs(prev => ({ ...prev, [reqId]: {
+      file_url: archiveDoc.file_url,
+      nama_file: archiveDoc.nama_dokumen || archiveDoc.jenis_dokumen,
+      ukuran: 0,
+      fromArchive: true,
+      archiveId: archiveDoc.id,
+    }}));
+  };
+
+  useEffect(() => {
+    if (step !== 3 || !selectedSvc || empArchives.length === 0) return;
+    const reqs = requirements[selectedSvc.id] || [];
+    setUploadedDocs(prev => {
+      const updated = { ...prev };
+      reqs.forEach(req => {
+        if (updated[req.id]) return;
+        const match = findMatchingArchive(req, empArchives);
+        if (match) {
+          updated[req.id] = {
+            file_url: match.file_url,
+            nama_file: match.nama_dokumen || match.jenis_dokumen,
+            ukuran: 0,
+            fromArchive: true,
+            archiveId: match.id,
+          };
+        }
+      });
+      return updated;
+    });
+  }, [step, selectedSvc, empArchives]);
 
   const handleSubmit = async () => {
     if (!selectedEmp || !selectedSvc) return;
@@ -270,7 +319,16 @@ export default function AjukanLayanan() {
                 filteredEmployees.map(emp => (
                   <button
                     key={emp.id}
-                    onClick={() => { setSelectedEmp(emp); setStep(2); }}
+                    onClick={async () => {
+                      setSelectedEmp(emp);
+                      setUploadedDocs({});
+                      setEmpArchives([]);
+                      try {
+                        const archData = await base44.entities.DocumentArchive.filter({ employee_id: emp.id }, '-tanggal_unggah', 200);
+                        setEmpArchives(archData);
+                      } catch(e) { console.error(e); }
+                      setStep(2);
+                    }}
                     className={`w-full text-left p-3 rounded-lg border transition-all hover:border-primary ${
                       selectedEmp?.id === emp.id ? 'border-primary bg-primary/5' : 'border-border'
                     }`}
@@ -341,6 +399,12 @@ export default function AjukanLayanan() {
         {step === 3 && (
           <div className="space-y-4">
             <h2 className="font-semibold text-lg">Unggah Dokumen Persyaratan</h2>
+            {empArchives.length > 0 && (
+              <div className="flex items-start gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <FolderArchive className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                <p className="text-xs text-blue-700">Dokumen yang sudah tersedia di arsip pegawai akan otomatis ditautkan. Anda tetap dapat mengunggah file baru jika diperlukan.</p>
+              </div>
+            )}
             <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
               <div>
                 <p className="text-sm font-medium">{selectedSvc?.nama_layanan}</p>
@@ -377,23 +441,44 @@ export default function AjukanLayanan() {
                           {req.keterangan && <p className="text-xs text-muted-foreground mt-1">{req.keterangan}</p>}
                           <p className="text-[10px] text-muted-foreground mt-1">Format: {req.format_diterima} · Max: {req.max_ukuran_mb}MB</p>
                           {uploaded ? (
-                            <div className="flex items-center gap-2 mt-2">
+                            <div className="flex items-center gap-2 mt-2 flex-wrap">
                               <CheckCircle2 className="w-4 h-4 text-green-500" />
+                              {uploaded.fromArchive && <FolderArchive className="w-3.5 h-3.5 text-blue-500" />}
                               <span className="text-xs text-green-700 font-medium truncate max-w-[200px]">{uploaded.nama_file}</span>
-                              <button onClick={() => handleRemoveUpload(req.id)} className="text-red-500 hover:text-red-700">
+                              {uploaded.fromArchive && (
+                                <span className="text-[10px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded font-medium">Dari Arsip</span>
+                              )}
+                              {uploaded.fromArchive && (
+                                <a href={uploaded.file_url} target="_blank" rel="noreferrer" className="text-blue-500 hover:text-blue-700" title="Lihat dokumen arsip">
+                                  <ExternalLink className="w-3.5 h-3.5" />
+                                </a>
+                              )}
+                              <button onClick={() => handleRemoveUpload(req.id)} className="text-red-500 hover:text-red-700" title="Hapus">
                                 <X className="w-4 h-4" />
                               </button>
                             </div>
                           ) : (
-                            <label className="mt-2 inline-flex items-center gap-2 px-3 py-1.5 bg-primary/10 text-primary rounded-lg text-xs font-medium cursor-pointer hover:bg-primary/20 transition-colors">
-                              <Upload className="w-3.5 h-3.5" /> Pilih File
-                              <input
-                                type="file"
-                                className="hidden"
-                                accept={`.${(req.format_diterima || 'pdf').toLowerCase()}`}
-                                onChange={e => handleUpload(req.id, e.target.files[0])}
-                              />
-                            </label>
+                            (() => {
+                              const match = findMatchingArchive(req, empArchives);
+                              return match ? (
+                                <div className="flex items-center gap-2 mt-2 flex-wrap">
+                                  <button onClick={() => handleUseFromArchive(req.id, match)} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-xs font-medium hover:bg-blue-100 transition-colors border border-blue-200">
+                                    <FolderArchive className="w-3.5 h-3.5" /> Gunakan dari Arsip
+                                  </button>
+                                  <span className="text-[10px] text-muted-foreground truncate max-w-[120px]">{match.nama_dokumen || match.jenis_dokumen}</span>
+                                  <span className="text-xs text-muted-foreground">atau</span>
+                                  <label className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary rounded-lg text-xs font-medium cursor-pointer hover:bg-primary/20 transition-colors">
+                                    <Upload className="w-3.5 h-3.5" /> Upload Baru
+                                    <input type="file" className="hidden" accept={`.${(req.format_diterima || 'pdf').toLowerCase()}`} onChange={e => handleUpload(req.id, e.target.files[0])} />
+                                  </label>
+                                </div>
+                              ) : (
+                                <label className="mt-2 inline-flex items-center gap-2 px-3 py-1.5 bg-primary/10 text-primary rounded-lg text-xs font-medium cursor-pointer hover:bg-primary/20 transition-colors">
+                                  <Upload className="w-3.5 h-3.5" /> Pilih File
+                                  <input type="file" className="hidden" accept={`.${(req.format_diterima || 'pdf').toLowerCase()}`} onChange={e => handleUpload(req.id, e.target.files[0])} />
+                                </label>
+                              );
+                            })()
                           )}
                         </div>
                       </div>
