@@ -130,7 +130,7 @@ export default function Pengguna() {
     finally { setLoading(false); }
   };
 
-  const isSuperAdmin = currentUser?.role === 'super_admin';
+  const isSuperAdmin = currentUser?.role === 'super_admin' || currentUser?.role === 'admin';
 
   const filtered = useMemo(() => {
     return users.filter(u => {
