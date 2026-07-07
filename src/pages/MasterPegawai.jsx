@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
-import { Search, Plus, Edit2, Trash2, Users, X } from 'lucide-react';
+import { Search, Plus, Edit2, Trash2, Users, X, FileSpreadsheet } from 'lucide-react';
 import moment from 'moment';
 import ImportExportBar from '@/components/pegawai/ImportExportBar';
+import BezzetingImport from '@/components/pegawai/BezzetingImport';
 import { exportToExcel, exportToPDF, exportToWord, importEmployeesFromFile } from '@/utils/exportImport';
 
 export default function MasterPegawai() {
@@ -17,6 +18,7 @@ export default function MasterPegawai() {
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null);
   const [importing, setImporting] = useState(false);
+  const [showBezzeting, setShowBezzeting] = useState(false);
 
   useEffect(() => {
     load();
@@ -108,6 +110,12 @@ export default function MasterPegawai() {
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           <ImportExportBar onImport={handleImport} onExport={handleExport} importing={importing} />
+          <button
+            onClick={() => setShowBezzeting(true)}
+            className="px-3 py-2 bg-primary/10 text-primary border border-primary/20 rounded-lg text-sm font-medium hover:bg-primary/20 flex items-center gap-2"
+          >
+            <FileSpreadsheet className="w-4 h-4" /> Import Bezzeting
+          </button>
           <button
             onClick={() => { setEditing(null); setShowForm(true); }}
             className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:opacity-90 flex items-center gap-2"
@@ -217,6 +225,7 @@ export default function MasterPegawai() {
       </div>
 
       {showForm && <EmployeeForm employee={editing} units={units} onClose={() => setShowForm(false)} onSaved={() => { setShowForm(false); load(); }} />}
+      {showBezzeting && <BezzetingImport employees={employees} units={units} onClose={() => setShowBezzeting(false)} onSynced={load} />}
     </div>
   );
 }
