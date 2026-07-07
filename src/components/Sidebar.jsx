@@ -5,7 +5,7 @@ import {
   LayoutDashboard, FileText, FilePlus, Ticket, CheckSquare,
   Users, FolderArchive, TrendingUp, Clock, CalendarDays,
   Award, FileCheck, BarChart3, FileType, Settings, HelpCircle,
-  Building2, ListChecks, Bell, X
+  Building2, ListChecks, Bell, X, DollarSign, Sparkles
 } from 'lucide-react';
 
 const menuItems = [
@@ -19,9 +19,12 @@ const menuItems = [
   { to: '/kenaikan-pangkat', label: 'Kenaikan Pangkat', icon: TrendingUp, roles: ['super_admin', 'admin_kepegawaian', 'pimpinan'] },
   { to: '/pensiun', label: 'Pensiun', icon: Clock, roles: ['super_admin', 'admin_kepegawaian', 'pimpinan'] },
   { to: '/cuti', label: 'Cuti', icon: CalendarDays, roles: ['super_admin', 'admin_kepegawaian', 'operator_biro', 'pegawai', 'pimpinan'] },
+  { to: '/kgb', label: 'KGB', icon: DollarSign, roles: ['super_admin', 'admin_kepegawaian', 'pimpinan'] },
+  { to: '/surat-keterangan', label: 'Surat Keterangan', icon: FileText, roles: ['super_admin', 'admin_kepegawaian', 'operator_biro', 'pegawai'] },
   { to: '/uji-kompetensi', label: 'Uji Kompetensi JF', icon: Award, roles: ['super_admin', 'admin_kepegawaian'] },
   { to: '/pelantikan', label: 'Pelantikan', icon: FileCheck, roles: ['super_admin', 'admin_kepegawaian'] },
   { to: '/laporan', label: 'Laporan', icon: BarChart3, roles: ['super_admin', 'admin_kepegawaian', 'pimpinan'] },
+  { to: '/ai-assistant', label: 'AI Assistant', icon: Sparkles, roles: ['super_admin', 'admin_kepegawaian', 'operator_biro', 'pegawai'] },
   { to: '/template', label: 'Template Dokumen', icon: FileType, roles: ['super_admin', 'admin_kepegawaian'] },
   { to: '/master-layanan', label: 'Master Layanan', icon: FileText, roles: ['super_admin', 'admin_kepegawaian'] },
   { to: '/master-checklist', label: 'Master Checklist', icon: ListChecks, roles: ['super_admin', 'admin_kepegawaian'] },

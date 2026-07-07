@@ -1,0 +1,75 @@
+{
+  "name": "FunctionalPositionTest",
+  "type": "object",
+  "properties": {
+    "employee_id": {
+      "type": "string"
+    },
+    "nama_pegawai": {
+      "type": "string"
+    },
+    "nip_pegawai": {
+      "type": "string"
+    },
+    "unit_id": {
+      "type": "string"
+    },
+    "nama_unit": {
+      "type": "string"
+    },
+    "jabatan_fungsional": {
+      "type": "string"
+    },
+    "jenjang_saat_ini": {
+      "type": "string"
+    },
+    "jenjang_dituju": {
+      "type": "string"
+    },
+    "angka_kredit_saat_ini": {
+      "type": "number"
+    },
+    "angka_kredit_syarat": {
+      "type": "number"
+    },
+    "status_konsultasi": {
+      "type": "string",
+      "enum": [
+        "Belum",
+        "Selesai",
+        "Perlu Tindak Lanjut"
+      ],
+      "default": "Belum"
+    },
+    "jadwal_pendaftaran": {
+      "type": "string",
+      "format": "date"
+    },
+    "jadwal_seleksi": {
+      "type": "string",
+      "format": "date"
+    },
+    "hasil_uji": {
+      "type": "string",
+      "enum": [
+        "Belum Uji",
+        "Lulus",
+        "Tidak Lulus"
+      ],
+      "default": "Belum Uji"
+    },
+    "bukti_kelulusan_url": {
+      "type": "string"
+    },
+    "catatan_tindak_lanjut": {
+      "type": "string"
+    },
+    "ticket_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "employee_id",
+    "jabatan_fungsional"
+  ]
+}

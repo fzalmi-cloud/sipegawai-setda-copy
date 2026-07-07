@@ -29,6 +29,9 @@ import MasterUnitKerja from '@/pages/MasterUnitKerja';
 import Notifikasi from '@/pages/Notifikasi';
 import Pengaturan from '@/pages/Pengaturan';
 import Bantuan from '@/pages/Bantuan';
+import KGB from '@/pages/KGB';
+import SuratKeterangan from '@/pages/SuratKeterangan';
+import AIAssistant from '@/pages/AIAssistant';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -64,8 +67,11 @@ const AuthenticatedApp = () => {
         <Route path="/kenaikan-pangkat" element={<KenaikanPangkat />} />
         <Route path="/pensiun" element={<Pensiun />} />
         <Route path="/cuti" element={<Cuti />} />
+        <Route path="/kgb" element={<KGB />} />
+        <Route path="/surat-keterangan" element={<SuratKeterangan />} />
         <Route path="/uji-kompetensi" element={<UjiKompetensiJF />} />
         <Route path="/pelantikan" element={<Pelantikan />} />
+        <Route path="/ai-assistant" element={<AIAssistant />} />
         <Route path="/laporan" element={<Laporan />} />
         <Route path="/template" element={<TemplateDokumen />} />
         <Route path="/master-layanan" element={<MasterLayanan />} />

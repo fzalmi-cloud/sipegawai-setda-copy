@@ -1,0 +1,67 @@
+{
+  "name": "KgbRecord",
+  "type": "object",
+  "properties": {
+    "employee_id": {
+      "type": "string"
+    },
+    "nama_pegawai": {
+      "type": "string"
+    },
+    "nip_pegawai": {
+      "type": "string"
+    },
+    "unit_id": {
+      "type": "string"
+    },
+    "nama_unit": {
+      "type": "string"
+    },
+    "golongan_lama": {
+      "type": "string"
+    },
+    "golongan_baru": {
+      "type": "string"
+    },
+    "tmt_kgb": {
+      "type": "string",
+      "format": "date"
+    },
+    "masa_kerja_tahun": {
+      "type": "number"
+    },
+    "masa_kerja_bulan": {
+      "type": "number"
+    },
+    "gaji_pokok_lama": {
+      "type": "number"
+    },
+    "gaji_pokok_baru": {
+      "type": "number"
+    },
+    "no_sk": {
+      "type": "string"
+    },
+    "tanggal_sk": {
+      "type": "string",
+      "format": "date"
+    },
+    "ticket_id": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Terjadwal",
+        "Diajukan",
+        "Diproses",
+        "Selesai"
+      ],
+      "default": "Terjadwal"
+    }
+  },
+  "required": [
+    "employee_id",
+    "tmt_kgb"
+  ]
+}
