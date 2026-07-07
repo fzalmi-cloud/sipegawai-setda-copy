@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Plus, Edit2, Trash2, X, Scale, FileText } from 'lucide-react';
+import { Plus, Edit2, Trash2, X, Scale, FileText, Upload, FileUp, Link2, Trash } from 'lucide-react';
 
 export default function Pengaturan() {
   const [tab, setTab] = useState('regulation');
@@ -9,6 +9,7 @@ export default function Pengaturan() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null);
+  const [uploadingId, setUploadingId] = useState(null);
 
   useEffect(() => { load(); }, []);
   const load = async () => {
@@ -24,6 +25,33 @@ export default function Pengaturan() {
   };
 
   if (loading) return <div className="flex items-center justify-center min-h-[60vh]"><div className="w-8 h-8 border-4 border-muted border-t-primary rounded-full animate-spin"></div></div>;
+
+  const handleUploadDoc = async (regId, file) => {
+    if (!file) return;
+    setUploadingId(regId);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      await base44.entities.Regulation.update(regId, { url_dokumen: file_url });
+      setRegulations(prev => prev.map(r => r.id === regId ? { ...r, url_dokumen: file_url } : r));
+    } catch (e) { alert('Gagal mengunggah dokumen: ' + e.message); }
+    finally { setUploadingId(null); }
+  };
+
+  const handleDeleteDoc = async (regId) => {
+    if (!confirm('Hapus dokumen regulasi ini?')) return;
+    try {
+      await base44.entities.Regulation.update(regId, { url_dokumen: '' });
+      setRegulations(prev => prev.map(r => r.id === regId ? { ...r, url_dokumen: '' } : r));
+    } catch (e) { alert('Gagal menghapus dokumen: ' + e.message); }
+  };
+
+  const handleDeleteRegulation = async (regId) => {
+    if (!confirm('Yakin ingin menghapus regulasi ini? Tindakan tidak dapat dibatalkan.')) return;
+    try {
+      await base44.entities.Regulation.delete(regId);
+      setRegulations(prev => prev.filter(r => r.id !== regId));
+    } catch (e) { alert('Gagal menghapus regulasi: ' + e.message); }
+  };
 
   const tabs = [
     { id: 'regulation', label: 'Dasar Hukum & Regulasi', icon: Scale },
@@ -71,9 +99,37 @@ export default function Pengaturan() {
                   </div>
                   {r.nomor && <p className="text-xs text-muted-foreground mt-0.5">No. {r.nomor}</p>}
                   {r.ringkasan && <p className="text-xs text-muted-foreground mt-1">{r.ringkasan}</p>}
+                  {r.url_dokumen ? (
+                    <div className="flex items-center gap-2 mt-2">
+                      <a href={r.url_dokumen} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-xs text-primary hover:underline">
+                        <Link2 className="w-3 h-3" /> Lihat Dokumen
+                      </a>
+                      <label className="inline-flex items-center gap-1 text-xs text-blue-600 hover:underline cursor-pointer">
+                        {uploadingId === r.id ? (
+                          <><div className="w-3 h-3 border-2 border-blue-300 border-t-blue-600 rounded-full animate-spin" /> Mengganti...</>
+                        ) : (
+                          <><FileUp className="w-3 h-3" /> Ganti Dokumen</>
+                        )}
+                        <input type="file" accept=".pdf,.doc,.docx" className="hidden" onChange={e => handleUploadDoc(r.id, e.target.files?.[0])} disabled={uploadingId === r.id} />
+                      </label>
+                      <button onClick={() => handleDeleteDoc(r.id)} className="inline-flex items-center gap-1 text-xs text-red-600 hover:underline">
+                        <Trash className="w-3 h-3" /> Hapus Dokumen
+                      </button>
+                    </div>
+                  ) : (
+                    <label className="inline-flex items-center gap-1 text-xs text-primary hover:underline cursor-pointer mt-2">
+                      {uploadingId === r.id ? (
+                        <><div className="w-3 h-3 border-2 border-blue-300 border-t-blue-600 rounded-full animate-spin" /> Mengunggah...</>
+                      ) : (
+                        <><Upload className="w-3 h-3" /> Unggah Dokumen</>
+                      )}
+                      <input type="file" accept=".pdf,.doc,.docx" className="hidden" onChange={e => handleUploadDoc(r.id, e.target.files?.[0])} disabled={uploadingId === r.id} />
+                    </label>
+                  )}
                 </div>
-                <div className="flex items-center gap-1">
-                  <button onClick={() => { setEditing(r); setShowForm(true); }} className="p-1.5 text-muted-foreground hover:text-primary"><Edit2 className="w-4 h-4" /></button>
+                <div className="flex items-center gap-1 flex-shrink-0">
+                  <button onClick={() => { setEditing(r); setShowForm(true); }} title="Edit" className="p-1.5 text-muted-foreground hover:text-primary"><Edit2 className="w-4 h-4" /></button>
+                  <button onClick={() => handleDeleteRegulation(r.id)} title="Hapus Regulasi" className="p-1.5 text-muted-foreground hover:text-destructive"><Trash2 className="w-4 h-4" /></button>
                 </div>
               </div>
             ))}
