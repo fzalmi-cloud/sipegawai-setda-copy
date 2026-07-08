@@ -364,30 +364,31 @@ function InviteUserForm({ employees, units, onClose, onSaved }) {
     setSaving(true);
     try {
       const unit = units.find(u => u.id === unitId);
-      // Platform inviteUser only accepts "user" or "admin" — invite as "user",
-      // then set the custom role (pegawai, admin_kepegawaian, etc.) via User entity update
       await base44.users.inviteUser(email, 'user');
 
-      // The newly invited user may take a moment to be queryable — retry up to 5 times
-      let newUser = null;
-      for (let attempt = 0; attempt < 5 && !newUser; attempt++) {
-        if (attempt > 0) await new Promise(r => setTimeout(r, 1000));
-        const matches = await base44.entities.User.filter({ email });
-        if (matches.length > 0) newUser = matches[0];
+      // The newly invited user may take a moment to be queryable — retry via backend function
+      let lastError = null;
+      for (let attempt = 0; attempt < 6; attempt++) {
+        if (attempt > 0) await new Promise(r => setTimeout(r, 1500));
+        try {
+          const res = await base44.functions.invoke('updateInvitedUser', {
+            email,
+            nama_lengkap: nama,
+            role,
+            nip,
+            unit_id: unitId,
+            nama_unit: unit?.nama_unit || '',
+            jabatan,
+          });
+          if (res.data?.success) {
+            onSaved();
+            return;
+          }
+        } catch (e) {
+          lastError = e;
+        }
       }
-      if (newUser) {
-        await base44.entities.User.update(newUser.id, {
-          role,
-          nama_lengkap: nama,
-          nip,
-          unit_id: unitId,
-          nama_unit: unit?.nama_unit || '',
-          jabatan,
-          default_password: '12345678',
-          password_changed: false,
-        });
-      }
-      onSaved();
+      throw new Error(lastError?.response?.data?.error || 'Gagal memperbarui data pengguna setelah undangan');
     } catch (err) {
       alert('Gagal mengundang pengguna: ' + err.message);
     } finally { setSaving(false); }
