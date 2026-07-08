@@ -35,35 +35,21 @@ export default function ManualUserForm({ units, onClose, onSaved }) {
     setSaving(true);
     try {
       const unit = units.find(u => u.id === unitId);
-      const finalEmail = email || `${nama.toLowerCase().replace(/[^a-z0-9]+/g, '.')}@setda.sumbarprov.go.id`;
-
-      // Step 1: Invite user (creates the auth user record)
-      await base44.users.inviteUser(finalEmail, 'user');
-
-      // Step 2: Update custom fields via backend function (with retry for propagation delay)
-      let lastError = null;
-      for (let attempt = 0; attempt < 6; attempt++) {
-        if (attempt > 0) await new Promise(r => setTimeout(r, 1500));
-        try {
-          const res = await base44.functions.invoke('updateInvitedUser', {
-            email: finalEmail,
-            nama_lengkap: nama,
-            role,
-            nip,
-            unit_id: unitId || '',
-            nama_unit: unit?.nama_unit || '',
-            jabatan,
-            no_hp: noHp,
-          });
-          if (res.data?.success) {
-            onSaved();
-            return;
-          }
-        } catch (e) {
-          lastError = e;
-        }
+      const res = await base44.functions.invoke('createManualUser', {
+        nama_lengkap: nama,
+        nip,
+        email: email || undefined,
+        role,
+        unit_id: unitId || '',
+        nama_unit: unit?.nama_unit || '',
+        jabatan,
+        no_hp: noHp,
+      });
+      if (res.data?.success) {
+        onSaved();
+      } else {
+        alert('Gagal: ' + (res.data?.error || 'Terjadi kesalahan'));
       }
-      throw new Error(lastError?.response?.data?.error || 'Gagal memperbarui data pengguna setelah undangan');
     } catch (err) {
       alert('Gagal menambah pengguna: ' + (err.response?.data?.error || err.message));
     } finally {
