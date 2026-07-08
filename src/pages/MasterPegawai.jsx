@@ -27,7 +27,7 @@ export default function MasterPegawai() {
   const load = async () => {
     try {
       const [empData, unitData] = await Promise.all([
-        base44.entities.Employee.filter({}, 'nama_lengkap', 500),
+        base44.entities.Employee.filter({ deleted: false }, 'nama_lengkap', 500),
         base44.entities.Unit.filter({ aktif: true }, 'urutan', 50)
       ]);
       setEmployees(empData);
