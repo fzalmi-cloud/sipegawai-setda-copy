@@ -364,12 +364,15 @@ function InviteUserForm({ employees, units, onClose, onSaved }) {
     setSaving(true);
     try {
       const unit = units.find(u => u.id === unitId);
-      await base44.users.inviteUser(email, role);
+      // Platform inviteUser only accepts "user" or "admin" — invite as "user",
+      // then set the custom role (pegawai, admin_kepegawaian, etc.) via User entity update
+      await base44.users.inviteUser(email, 'user');
 
       const allUsers = await base44.entities.User.list(200);
       const newUser = allUsers.find(u => u.email === email);
       if (newUser) {
         await base44.entities.User.update(newUser.id, {
+          role,
           nip,
           unit_id: unitId,
           nama_unit: unit?.nama_unit || '',
