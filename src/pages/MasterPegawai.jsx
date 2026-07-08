@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
-import { Search, Plus, Edit2, Trash2, Users, X, FileSpreadsheet, LayoutList, Building2, ChevronDown, ChevronRight } from 'lucide-react';
+import { Search, Plus, Edit2, Trash2, Users, X, FileSpreadsheet, LayoutList, Building2, ChevronDown, ChevronRight, Award, BarChart3 } from 'lucide-react';
 import moment from 'moment';
 import ImportExportBar from '@/components/pegawai/ImportExportBar';
 import BezzetingImport from '@/components/pegawai/BezzetingImport';
+import PegawaiCharts from '@/components/pegawai/PegawaiCharts';
 import { exportToExcel, exportToPDF, exportToWord, importEmployeesFromFile } from '@/utils/exportImport';
 
 export default function MasterPegawai() {
@@ -20,6 +21,7 @@ export default function MasterPegawai() {
   const [importing, setImporting] = useState(false);
   const [showBezzeting, setShowBezzeting] = useState(false);
   const [viewMode, setViewMode] = useState('list');
+  const [filterGolongan, setFilterGolongan] = useState('all');
   const [expandedUnits, setExpandedUnits] = useState({});
 
   useEffect(() => {
@@ -45,7 +47,8 @@ export default function MasterPegawai() {
         e.nip?.includes(search);
       const matchUnit = filterUnit === 'all' || e.unit_id === filterUnit;
       const matchStatus = filterStatus === 'all' || e.status_pegawai === filterStatus;
-      return matchSearch && matchUnit && matchStatus;
+      const matchGolongan = filterGolongan === 'all' || e.pangkat_golongan === filterGolongan;
+      return matchSearch && matchUnit && matchStatus && matchGolongan;
     });
   }, [employees, search, filterUnit, filterStatus]);
 
@@ -71,6 +74,28 @@ export default function MasterPegawai() {
       return (uA?.urutan ?? 999) - (uB?.urutan ?? 999);
     });
   }, [filtered, units]);
+
+  const golonganOptions = useMemo(() => {
+    const set = new Set();
+    employees.forEach(e => { if (e.pangkat_golongan) set.add(e.pangkat_golongan); });
+    return Array.from(set).sort();
+  }, [employees]);
+
+  const groupedByGolongan = useMemo(() => {
+    const groups = {};
+    filtered.forEach(emp => {
+      const gol = emp.pangkat_golongan?.trim() || 'Belum Diisi';
+      if (!groups[gol]) groups[gol] = { golongan: gol, employees: [] };
+      groups[gol].employees.push(emp);
+    });
+    const golOrder = (g) => {
+      const m = g.match(/([IV]+)\/([a-e])/i);
+      if (!m) return 999;
+      const rom = { I: 1, II: 2, III: 3, IV: 4 };
+      return (rom[m[1].toUpperCase()] || 9) * 10 + (m[2].toLowerCase().charCodeAt(0) - 96);
+    };
+    return Object.values(groups).sort((a, b) => golOrder(a.golongan) - golOrder(b.golongan));
+  }, [filtered]);
 
   const toggleUnit = (unitName) => {
     setExpandedUnits(prev => ({ ...prev, [unitName]: !prev[unitName] }));
@@ -164,6 +189,10 @@ export default function MasterPegawai() {
           <option value="all">Semua Unit</option>
           {units.map(u => <option key={u.id} value={u.id}>{u.nama_unit}</option>)}
         </select>
+        <select value={filterGolongan} onChange={e => setFilterGolongan(e.target.value)} className="px-4 py-2.5 text-sm bg-card rounded-lg border border-input outline-none focus:border-primary">
+          <option value="all">Semua Golongan</option>
+          {golonganOptions.map(g => <option key={g} value={g}>{g}</option>)}
+        </select>
         <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} className="px-4 py-2.5 text-sm bg-card rounded-lg border border-input outline-none focus:border-primary">
           <option value="all">Semua Status</option>
           <option value="Aktif">Aktif</option>
@@ -175,20 +204,37 @@ export default function MasterPegawai() {
       </div>
 
       {/* View Toggle */}
-      <div className="flex gap-2 p-1 bg-muted/50 rounded-lg w-fit">
+      <div className="flex gap-1 p-1 bg-muted/50 rounded-lg w-fit flex-wrap">
         <button
           onClick={() => setViewMode('list')}
-          className={`px-4 py-2 rounded-md text-sm font-medium flex items-center gap-2 ${viewMode === 'list' ? 'bg-card shadow-sm' : 'text-muted-foreground'}`}
+          className={`px-3 py-2 rounded-md text-sm font-medium flex items-center gap-2 ${viewMode === 'list' ? 'bg-card shadow-sm' : 'text-muted-foreground'}`}
         >
           <LayoutList className="w-4 h-4" /> Daftar
         </button>
         <button
           onClick={() => setViewMode('grouped')}
-          className={`px-4 py-2 rounded-md text-sm font-medium flex items-center gap-2 ${viewMode === 'grouped' ? 'bg-card shadow-sm' : 'text-muted-foreground'}`}
+          className={`px-3 py-2 rounded-md text-sm font-medium flex items-center gap-2 ${viewMode === 'grouped' ? 'bg-card shadow-sm' : 'text-muted-foreground'}`}
         >
           <Building2 className="w-4 h-4" /> Per Biro
         </button>
+        <button
+          onClick={() => setViewMode('golongan')}
+          className={`px-3 py-2 rounded-md text-sm font-medium flex items-center gap-2 ${viewMode === 'golongan' ? 'bg-card shadow-sm' : 'text-muted-foreground'}`}
+        >
+          <Award className="w-4 h-4" /> Per Golongan
+        </button>
+        <button
+          onClick={() => setViewMode('charts')}
+          className={`px-3 py-2 rounded-md text-sm font-medium flex items-center gap-2 ${viewMode === 'charts' ? 'bg-card shadow-sm' : 'text-muted-foreground'}`}
+        >
+          <BarChart3 className="w-4 h-4" /> Diagram
+        </button>
       </div>
+
+      {/* Charts View */}
+      {viewMode === 'charts' && (
+        <PegawaiCharts employees={filtered} units={units} />
+      )}
 
       {/* Grouped by Biro View */}
       {viewMode === 'grouped' && (
@@ -232,6 +278,61 @@ export default function MasterPegawai() {
                           <p className="text-xs text-muted-foreground">{emp.nip} · {emp.jabatan || '-'}</p>
                         </div>
                         <span className="text-xs text-muted-foreground hidden sm:block">{emp.pangkat_golongan || '-'}</span>
+                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${emp.status_pegawai === 'Aktif' ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-500'}`}>{emp.status_pegawai}</span>
+                        <div className="flex items-center gap-1">
+                          <button onClick={() => { setEditing(emp); setShowForm(true); }} className="p-1.5 text-muted-foreground hover:text-primary"><Edit2 className="w-4 h-4" /></button>
+                          <button onClick={() => handleDelete(emp.id)} className="p-1.5 text-muted-foreground hover:text-destructive"><Trash2 className="w-4 h-4" /></button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))
+          )}
+        </div>
+      )}
+
+      {/* Grouped by Golongan View */}
+      {viewMode === 'golongan' && (
+        <div className="space-y-3">
+          {groupedByGolongan.length === 0 ? (
+            <div className="text-center py-12 text-muted-foreground bg-card rounded-xl border border-border">
+              <Users className="w-10 h-10 mx-auto mb-2 opacity-30" />Tidak ada pegawai
+            </div>
+          ) : (
+            groupedByGolongan.map(group => (
+              <div key={group.golongan} className="bg-card rounded-xl border border-border overflow-hidden">
+                <button
+                  onClick={() => toggleUnit(group.golongan)}
+                  className="w-full flex items-center justify-between p-4 hover:bg-muted/30"
+                >
+                  <div className="flex items-center gap-3 text-left">
+                    <div className="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center text-amber-600">
+                      <Award className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-sm">Golongan {group.golongan}</p>
+                      <p className="text-xs text-muted-foreground">{group.employees.length} pegawai</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs px-2 py-1 rounded-full bg-amber-50 text-amber-700 font-medium">
+                      {group.employees.filter(e => e.status_pegawai === 'Aktif').length} Aktif
+                    </span>
+                    {expandedUnits[group.golongan] ? <ChevronDown className="w-4 h-4 text-muted-foreground" /> : <ChevronRight className="w-4 h-4 text-muted-foreground" />}
+                  </div>
+                </button>
+                {expandedUnits[group.golongan] && (
+                  <div className="border-t border-border divide-y divide-border">
+                    {group.employees.map(emp => (
+                      <div key={emp.id} className="flex items-center gap-3 px-4 py-3 hover:bg-muted/30">
+                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">{emp.nama_lengkap?.charAt(0)}</div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-sm truncate">{emp.nama_lengkap}</p>
+                          <p className="text-xs text-muted-foreground">{emp.nip} · {emp.jabatan || '-'}</p>
+                        </div>
+                        <span className="text-xs text-muted-foreground hidden sm:block">{emp.nama_unit || '-'}</span>
                         <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${emp.status_pegawai === 'Aktif' ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-500'}`}>{emp.status_pegawai}</span>
                         <div className="flex items-center gap-1">
                           <button onClick={() => { setEditing(emp); setShowForm(true); }} className="p-1.5 text-muted-foreground hover:text-primary"><Edit2 className="w-4 h-4" /></button>
