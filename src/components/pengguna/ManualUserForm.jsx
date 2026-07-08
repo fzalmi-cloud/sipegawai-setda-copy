@@ -35,21 +35,35 @@ export default function ManualUserForm({ units, onClose, onSaved }) {
     setSaving(true);
     try {
       const unit = units.find(u => u.id === unitId);
-      const res = await base44.functions.invoke('createManualUser', {
-        nama_lengkap: nama,
-        nip,
-        email: email || undefined,
-        role,
-        unit_id: unitId || '',
-        nama_unit: unit?.nama_unit || '',
-        jabatan,
-        no_hp: noHp,
-      });
-      if (res.data?.success) {
-        onSaved();
-      } else {
-        alert('Gagal: ' + (res.data?.error || 'Terjadi kesalahan'));
+      const finalEmail = email || `${nama.toLowerCase().replace(/[^a-z0-9]+/g, '.')}@setda.sumbarprov.go.id`;
+
+      // Step 1: Invite user (creates the auth user record)
+      await base44.users.inviteUser(finalEmail, 'user');
+
+      // Step 2: Update custom fields via backend function (with retry for propagation delay)
+      let lastError = null;
+      for (let attempt = 0; attempt < 6; attempt++) {
+        if (attempt > 0) await new Promise(r => setTimeout(r, 1500));
+        try {
+          const res = await base44.functions.invoke('updateInvitedUser', {
+            email: finalEmail,
+            nama_lengkap: nama,
+            role,
+            nip,
+            unit_id: unitId || '',
+            nama_unit: unit?.nama_unit || '',
+            jabatan,
+            no_hp: noHp,
+          });
+          if (res.data?.success) {
+            onSaved();
+            return;
+          }
+        } catch (e) {
+          lastError = e;
+        }
       }
+      throw new Error(lastError?.response?.data?.error || 'Gagal memperbarui data pengguna setelah undangan');
     } catch (err) {
       alert('Gagal menambah pengguna: ' + (err.response?.data?.error || err.message));
     } finally {
@@ -62,15 +76,15 @@ export default function ManualUserForm({ units, onClose, onSaved }) {
       <div className="bg-card rounded-xl border border-border w-full max-w-lg max-h-[90vh] overflow-y-auto scrollbar-thin">
         <div className="sticky top-0 bg-card border-b border-border px-5 py-4 flex items-center justify-between">
           <h3 className="font-semibold text-lg flex items-center gap-2">
-            <UserPlus className="w-5 h-5" /> Tambah Pengguna Manual
+            <UserPlus className="w-5 h-5" /> Tambah Pengguna
           </h3>
           <button onClick={onClose} className="p-1 hover:bg-muted rounded"><X className="w-5 h-5" /></button>
         </div>
         <form onSubmit={handleSubmit} className="p-5 space-y-4">
-          <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-            <p className="text-xs text-blue-800 flex items-start gap-2">
+          <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
+            <p className="text-xs text-amber-800 flex items-start gap-2">
               <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
-              Pengguna dibuat langsung tanpa mengirim email. Login menggunakan NIP (jika diisi) atau email dengan password default <strong>12345678</strong>.
+              Cukup isi nama lengkap. Jika email dikosongkan, sistem akan membuat email otomatis dari nama. Password default <strong>12345678</strong>.
             </p>
           </div>
 
