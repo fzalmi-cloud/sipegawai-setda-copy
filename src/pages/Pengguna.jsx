@@ -368,8 +368,13 @@ function InviteUserForm({ employees, units, onClose, onSaved }) {
       // then set the custom role (pegawai, admin_kepegawaian, etc.) via User entity update
       await base44.users.inviteUser(email, 'user');
 
-      const allUsers = await base44.entities.User.list(200);
-      const newUser = allUsers.find(u => u.email === email);
+      // The newly invited user may take a moment to be queryable — retry up to 5 times
+      let newUser = null;
+      for (let attempt = 0; attempt < 5 && !newUser; attempt++) {
+        if (attempt > 0) await new Promise(r => setTimeout(r, 1000));
+        const matches = await base44.entities.User.filter({ email });
+        if (matches.length > 0) newUser = matches[0];
+      }
       if (newUser) {
         await base44.entities.User.update(newUser.id, {
           role,
