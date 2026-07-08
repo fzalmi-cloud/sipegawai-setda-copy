@@ -14,6 +14,9 @@
       ],
       "default": "pegawai"
     },
+    "nama_lengkap": {
+      "type": "string"
+    },
     "nip": {
       "type": "string"
     },

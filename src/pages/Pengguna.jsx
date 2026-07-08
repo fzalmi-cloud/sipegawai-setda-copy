@@ -263,10 +263,10 @@ export default function Pengguna() {
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
                         <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
-                          {u.full_name?.charAt(0) || 'U'}
+                          {(u.nama_lengkap || u.full_name)?.charAt(0) || 'U'}
                         </div>
                         <div>
-                          <p className="font-medium">{u.full_name}</p>
+                          <p className="font-medium">{u.nama_lengkap || u.full_name || u.email}</p>
                           <p className="text-xs text-muted-foreground">{u.email}</p>
                         </div>
                       </div>
@@ -378,6 +378,7 @@ function InviteUserForm({ employees, units, onClose, onSaved }) {
       if (newUser) {
         await base44.entities.User.update(newUser.id, {
           role,
+          nama_lengkap: nama,
           nip,
           unit_id: unitId,
           nama_unit: unit?.nama_unit || '',
@@ -535,10 +536,10 @@ function EditUserForm({ user, units, onClose, onSaved }) {
         <form onSubmit={handleSubmit} className="p-5 space-y-4">
           <div className="bg-muted/30 rounded-lg p-3 flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
-              {user.full_name?.charAt(0) || 'U'}
+              {(user.nama_lengkap || user.full_name)?.charAt(0) || 'U'}
             </div>
             <div>
-              <p className="font-medium text-sm">{user.full_name}</p>
+              <p className="font-medium text-sm">{user.nama_lengkap || user.full_name || user.email}</p>
               <p className="text-xs text-muted-foreground">{user.email}</p>
               <p className="text-xs text-muted-foreground">NIP: {user.nip || '-'}</p>
             </div>
@@ -604,10 +605,10 @@ function PasswordModal({ user, onClose, onReset }) {
         <div className="space-y-3">
           <div className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg">
             <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
-              {user.full_name?.charAt(0) || 'U'}
+              {(user.nama_lengkap || user.full_name)?.charAt(0) || 'U'}
             </div>
             <div>
-              <p className="font-medium text-sm">{user.full_name}</p>
+              <p className="font-medium text-sm">{user.nama_lengkap || user.full_name || user.email}</p>
               <p className="text-xs text-muted-foreground">{user.email}</p>
             </div>
           </div>
