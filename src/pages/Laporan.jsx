@@ -9,6 +9,53 @@ import {
 } from 'recharts';
 import moment from 'moment';
 
+const LAPORAN_COLUMNS = [
+  { key: 'nomor_tiket', label: 'No. Tiket' },
+  { key: 'nama_pegawai', label: 'Nama Pegawai' },
+  { key: 'nip_pegawai', label: 'NIP' },
+  { key: 'nama_layanan', label: 'Layanan' },
+  { key: 'kategori_layanan', label: 'Kategori' },
+  { key: 'nama_unit', label: 'Unit/Biro' },
+  { key: 'status', label: 'Status' },
+  { key: 'prioritas', label: 'Prioritas' },
+  { key: 'persentase_kelengkapan', label: 'Kelengkapan (%)' },
+  { key: 'terlambat_sla', label: 'Terlambat SLA' },
+  { key: 'tanggal_pengajuan', label: 'Tanggal Pengajuan' },
+  { key: 'tanggal_selesai', label: 'Tanggal Selesai' },
+  { key: 'nama_pengaju', label: 'Diajukan Oleh' },
+  { key: 'nama_petugas', label: 'Petugas' },
+  { key: 'catatan_verifikasi', label: 'Catatan Verifikasi' },
+];
+
+function exportLaporanExcel(data) {
+  let html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">';
+  html += '<head><meta charset="utf-8"><style>td,th{font-family:Arial;font-size:10px;border:1px solid #333;padding:4px;white-space:nowrap}th{background:#1e3a5f;color:#fff;font-weight:bold}</style></head><body>';
+  html += '<table><thead><tr>';
+  LAPORAN_COLUMNS.forEach(col => { html += `<th>${col.label}</th>`; });
+  html += '</tr></thead><tbody>';
+  data.forEach(t => {
+    html += '<tr>';
+    LAPORAN_COLUMNS.forEach(col => {
+      let val = t[col.key] ?? '';
+      if (col.key === 'tanggal_pengajuan' || col.key === 'tanggal_selesai') {
+        val = val ? moment(val).format('DD MMM YYYY HH:mm') : '';
+      } else if (col.key === 'terlambat_sla') {
+        val = val ? 'Ya' : 'Tidak';
+      }
+      html += `<td>${String(val).replace(/</g, '&lt;')}</td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table></body></html>';
+  const blob = new Blob(['\ufeff' + html], { type: 'application/vnd.ms-excel' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `Laporan_Layanan_${moment().format('YYYYMMDD_HHmm')}.xls`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 export default function Laporan() {
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -68,6 +115,13 @@ export default function Laporan() {
           <h1 className="text-2xl lg:text-3xl font-heading font-bold">Laporan & Rekap Layanan</h1>
           <p className="text-muted-foreground mt-1">{filtered.length} tiket dalam filter</p>
         </div>
+        <button
+          onClick={() => exportLaporanExcel(filtered)}
+          disabled={filtered.length === 0}
+          className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50 flex items-center gap-2"
+        >
+          <Download className="w-4 h-4" /> Ekspor Excel
+        </button>
       </div>
 
       <div className="bg-card rounded-xl border border-border p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
