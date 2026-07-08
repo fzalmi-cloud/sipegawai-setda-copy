@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
-import { Search, Plus, Edit2, Trash2, Users, X, FileSpreadsheet } from 'lucide-react';
+import { Search, Plus, Edit2, Trash2, Users, X, FileSpreadsheet, LayoutList, Building2, ChevronDown, ChevronRight } from 'lucide-react';
 import moment from 'moment';
 import ImportExportBar from '@/components/pegawai/ImportExportBar';
 import BezzetingImport from '@/components/pegawai/BezzetingImport';
@@ -19,6 +19,8 @@ export default function MasterPegawai() {
   const [editing, setEditing] = useState(null);
   const [importing, setImporting] = useState(false);
   const [showBezzeting, setShowBezzeting] = useState(false);
+  const [viewMode, setViewMode] = useState('list');
+  const [expandedUnits, setExpandedUnits] = useState({});
 
   useEffect(() => {
     load();
@@ -46,6 +48,33 @@ export default function MasterPegawai() {
       return matchSearch && matchUnit && matchStatus;
     });
   }, [employees, search, filterUnit, filterStatus]);
+
+  const groupedByUnit = useMemo(() => {
+    const groups = {};
+    filtered.forEach(emp => {
+      const unitName = emp.nama_unit || 'Tanpa Unit';
+      if (!groups[unitName]) {
+        const unit = units.find(u => u.nama_unit === unitName);
+        groups[unitName] = {
+          unitName,
+          unitId: unit?.id || '',
+          jenis: unit?.jenis || '',
+          keterangan: unit?.keterangan || '',
+          employees: [],
+        };
+      }
+      groups[unitName].employees.push(emp);
+    });
+    return Object.values(groups).sort((a, b) => {
+      const uA = units.find(u => u.nama_unit === a.unitName);
+      const uB = units.find(u => u.nama_unit === b.unitName);
+      return (uA?.urutan ?? 999) - (uB?.urutan ?? 999);
+    });
+  }, [filtered, units]);
+
+  const toggleUnit = (unitName) => {
+    setExpandedUnits(prev => ({ ...prev, [unitName]: !prev[unitName] }));
+  };
 
   const handleImport = async (file) => {
     setImporting(true);
@@ -145,6 +174,82 @@ export default function MasterPegawai() {
         </select>
       </div>
 
+      {/* View Toggle */}
+      <div className="flex gap-2 p-1 bg-muted/50 rounded-lg w-fit">
+        <button
+          onClick={() => setViewMode('list')}
+          className={`px-4 py-2 rounded-md text-sm font-medium flex items-center gap-2 ${viewMode === 'list' ? 'bg-card shadow-sm' : 'text-muted-foreground'}`}
+        >
+          <LayoutList className="w-4 h-4" /> Daftar
+        </button>
+        <button
+          onClick={() => setViewMode('grouped')}
+          className={`px-4 py-2 rounded-md text-sm font-medium flex items-center gap-2 ${viewMode === 'grouped' ? 'bg-card shadow-sm' : 'text-muted-foreground'}`}
+        >
+          <Building2 className="w-4 h-4" /> Per Biro
+        </button>
+      </div>
+
+      {/* Grouped by Biro View */}
+      {viewMode === 'grouped' && (
+        <div className="space-y-3">
+          {groupedByUnit.length === 0 ? (
+            <div className="text-center py-12 text-muted-foreground bg-card rounded-xl border border-border">
+              <Users className="w-10 h-10 mx-auto mb-2 opacity-30" />Tidak ada pegawai
+            </div>
+          ) : (
+            groupedByUnit.map(group => (
+              <div key={group.unitName} className="bg-card rounded-xl border border-border overflow-hidden">
+                <button
+                  onClick={() => toggleUnit(group.unitName)}
+                  className="w-full flex items-center justify-between p-4 hover:bg-muted/30"
+                >
+                  <div className="flex items-center gap-3 text-left">
+                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                      <Building2 className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-sm">{group.unitName}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {group.jenis ? `${group.jenis} · ` : ''}{group.employees.length} pegawai
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs px-2 py-1 rounded-full bg-green-50 text-green-700 font-medium">
+                      {group.employees.filter(e => e.status_pegawai === 'Aktif').length} Aktif
+                    </span>
+                    {expandedUnits[group.unitName] ? <ChevronDown className="w-4 h-4 text-muted-foreground" /> : <ChevronRight className="w-4 h-4 text-muted-foreground" />}
+                  </div>
+                </button>
+                {expandedUnits[group.unitName] && (
+                  <div className="border-t border-border divide-y divide-border">
+                    {group.employees.map(emp => (
+                      <div key={emp.id} className="flex items-center gap-3 px-4 py-3 hover:bg-muted/30">
+                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">{emp.nama_lengkap?.charAt(0)}</div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-sm truncate">{emp.nama_lengkap}</p>
+                          <p className="text-xs text-muted-foreground">{emp.nip} · {emp.jabatan || '-'}</p>
+                        </div>
+                        <span className="text-xs text-muted-foreground hidden sm:block">{emp.pangkat_golongan || '-'}</span>
+                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${emp.status_pegawai === 'Aktif' ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-500'}`}>{emp.status_pegawai}</span>
+                        <div className="flex items-center gap-1">
+                          <button onClick={() => { setEditing(emp); setShowForm(true); }} className="p-1.5 text-muted-foreground hover:text-primary"><Edit2 className="w-4 h-4" /></button>
+                          <button onClick={() => handleDelete(emp.id)} className="p-1.5 text-muted-foreground hover:text-destructive"><Trash2 className="w-4 h-4" /></button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))
+          )}
+        </div>
+      )}
+
+      {/* List View */}
+      {viewMode === 'list' && (
+        <>
       {/* Desktop Table */}
       <div className="hidden lg:block bg-card rounded-xl border border-border overflow-hidden overflow-x-auto">
         <table className="w-full text-sm">
@@ -223,6 +328,8 @@ export default function MasterPegawai() {
           ))
         )}
       </div>
+        </>
+      )}
 
       {showForm && <EmployeeForm employee={editing} units={units} onClose={() => setShowForm(false)} onSaved={() => { setShowForm(false); load(); }} />}
       {showBezzeting && <BezzetingImport employees={employees} units={units} onClose={() => setShowBezzeting(false)} onSynced={load} />}
