@@ -1,0 +1,63 @@
+{
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "auto_archive_completed_tickets",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "archive_tickets": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "autoArchiveCompletedTickets",
+            "args": {}
+          },
+          "then": "check_result",
+          "x-base44": {
+            "title": "Arsipkan Tiket Selesai",
+            "description": "Jalankan fungsi auto-archive"
+          }
+        }
+      },
+      {
+        "check_result": {
+          "switch": [
+            {
+              "when": "${ .archive_tickets.archived_count > 0 }",
+              "then": "end"
+            },
+            {
+              "when": "${ true }",
+              "then": "end"
+            }
+          ],
+          "x-base44": {
+            "title": "Cek Hasil",
+            "description": "Apakah ada tiket diarsipkan"
+          }
+        }
+      }
+    ]
+  },
+  "description": "Otomatis memindahkan tiket berstatus Selesai ke arsip setiap hari jam 23:00 WIB agar dashboard tetap bersih dan terorganisir.",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "0 23 * * *",
+      "one_time_date": null,
+      "timezone": "Asia/Jakarta",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "name": "Auto Archive Completed Tickets"
+}
