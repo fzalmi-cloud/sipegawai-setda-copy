@@ -505,6 +505,8 @@ function InviteUserForm({ employees, units, onClose, onSaved }) {
 }
 
 function EditUserForm({ user, units, onClose, onSaved }) {
+  const [namaLengkap, setNamaLengkap] = useState(user.nama_lengkap || user.full_name || '');
+  const [nip, setNip] = useState(user.nip || '');
   const [role, setRole] = useState(user.role || 'pegawai');
   const [unitId, setUnitId] = useState(user.unit_id || '');
   const [jabatan, setJabatan] = useState(user.jabatan || '');
@@ -517,6 +519,8 @@ function EditUserForm({ user, units, onClose, onSaved }) {
     try {
       const unit = units.find(u => u.id === unitId);
       await base44.entities.User.update(user.id, {
+        nama_lengkap: namaLengkap,
+        nip,
         role,
         unit_id: unitId,
         nama_unit: unit?.nama_unit || '',
@@ -545,6 +549,18 @@ function EditUserForm({ user, units, onClose, onSaved }) {
               <p className="text-xs text-muted-foreground">{user.email}</p>
               <p className="text-xs text-muted-foreground">NIP: {user.nip || '-'}</p>
             </div>
+          </div>
+
+          <div>
+            <label className="text-xs font-medium text-muted-foreground">Nama Lengkap</label>
+            <input type="text" value={namaLengkap} onChange={e => setNamaLengkap(e.target.value)}
+              className="w-full mt-1 px-3 py-2 text-sm bg-muted/60 rounded-lg border border-input outline-none focus:border-primary" />
+          </div>
+
+          <div>
+            <label className="text-xs font-medium text-muted-foreground">NIP</label>
+            <input type="text" value={nip} onChange={e => setNip(e.target.value)}
+              className="w-full mt-1 px-3 py-2 text-sm bg-muted/60 rounded-lg border border-input outline-none focus:border-primary" />
           </div>
 
           <div>
