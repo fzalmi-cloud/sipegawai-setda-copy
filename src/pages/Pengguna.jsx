@@ -360,11 +360,12 @@ function InviteUserForm({ employees, units, onClose, onSaved }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!email || !role) return;
+    if (!nama || !role) return;
     setSaving(true);
     try {
       const unit = units.find(u => u.id === unitId);
-      await base44.users.inviteUser(email, 'user');
+      const finalEmail = email || `${nama.toLowerCase().replace(/[^a-z0-9]+/g, '.')}@setda.sumbarprov.go.id`;
+      await base44.users.inviteUser(finalEmail, 'user');
 
       // The newly invited user may take a moment to be queryable — retry via backend function
       let lastError = null;
@@ -372,7 +373,7 @@ function InviteUserForm({ employees, units, onClose, onSaved }) {
         if (attempt > 0) await new Promise(r => setTimeout(r, 1500));
         try {
           const res = await base44.functions.invoke('updateInvitedUser', {
-            email,
+            email: finalEmail,
             nama_lengkap: nama,
             role,
             nip,
@@ -430,22 +431,22 @@ function InviteUserForm({ employees, units, onClose, onSaved }) {
                   className="w-full mt-1 px-3 py-2 text-sm bg-muted/60 rounded-lg border border-input outline-none focus:border-primary" />
               </div>
               <div>
-                <label className="text-xs font-medium text-muted-foreground">NIP (Username) <span className="text-red-500">*</span></label>
-                <input type="text" value={nip} onChange={e => setNip(e.target.value)} required
+                <label className="text-xs font-medium text-muted-foreground">NIP</label>
+                <input type="text" value={nip} onChange={e => setNip(e.target.value)}
                   className="w-full mt-1 px-3 py-2 text-sm bg-muted/60 rounded-lg border border-input outline-none focus:border-primary" />
               </div>
             </>
           )}
 
           <div>
-            <label className="text-xs font-medium text-muted-foreground">Email <span className="text-red-500">*</span></label>
+            <label className="text-xs font-medium text-muted-foreground">Email {mode === 'existing' ? <span className="text-red-500">*</span> : <span className="text-muted-foreground/60">(opsional)</span>}</label>
             <div className="relative mt-1">
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <input type="email" value={email} onChange={e => setEmail(e.target.value)} required
+              <input type="email" value={email} onChange={e => setEmail(e.target.value)} required={mode === 'existing'}
                 placeholder="email@setda.sumbarprov.go.id"
                 className="w-full pl-9 pr-3 py-2 text-sm bg-muted/60 rounded-lg border border-input outline-none focus:border-primary" />
             </div>
-            <p className="text-[11px] text-muted-foreground mt-1">Username login = NIP. Password default: 12345678</p>
+            <p className="text-[11px] text-muted-foreground mt-1">Jika email diisi, pengguna akan menerima undangan login. Password default: 12345678</p>
           </div>
 
           <div>
