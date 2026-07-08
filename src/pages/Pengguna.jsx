@@ -6,6 +6,7 @@ import {
   CheckCircle2, AlertCircle, Lock, Unlock, ChevronDown, ChevronRight
 } from 'lucide-react';
 import moment from 'moment';
+import ManualUserForm from '@/components/pengguna/ManualUserForm';
 
 const roleInfo = {
   super_admin: {
@@ -110,6 +111,7 @@ export default function Pengguna() {
   const [search, setSearch] = useState('');
   const [filterRole, setFilterRole] = useState('all');
   const [showInvite, setShowInvite] = useState(false);
+  const [showManual, setShowManual] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [passwordUser, setPasswordUser] = useState(null);
   const [expandedRole, setExpandedRole] = useState(null);
@@ -182,12 +184,20 @@ export default function Pengguna() {
           <h1 className="text-2xl lg:text-3xl font-heading font-bold">Manajemen Pengguna</h1>
           <p className="text-muted-foreground mt-1">{users.length} pengguna terdaftar</p>
         </div>
-        <button
-          onClick={() => setShowInvite(true)}
-          className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:opacity-90 flex items-center gap-2"
-        >
-          <UserPlus className="w-4 h-4" /> Undang Pengguna
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowManual(true)}
+            className="px-4 py-2 bg-primary/10 text-primary border border-primary/20 rounded-lg text-sm font-medium hover:bg-primary/20 flex items-center gap-2"
+          >
+            <UserCog className="w-4 h-4" /> Tambah Manual
+          </button>
+          <button
+            onClick={() => setShowInvite(true)}
+            className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:opacity-90 flex items-center gap-2"
+          >
+            <UserPlus className="w-4 h-4" /> Undang Pengguna
+          </button>
+        </div>
       </div>
 
       {/* Role Overview */}
@@ -312,6 +322,14 @@ export default function Pengguna() {
           units={units}
           onClose={() => setShowInvite(false)}
           onSaved={() => { setShowInvite(false); load(); }}
+        />
+      )}
+
+      {showManual && (
+        <ManualUserForm
+          units={units}
+          onClose={() => setShowManual(false)}
+          onSaved={() => { setShowManual(false); load(); }}
         />
       )}
 
