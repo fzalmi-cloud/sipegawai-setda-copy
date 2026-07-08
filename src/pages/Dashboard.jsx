@@ -80,6 +80,29 @@ export default function Dashboard() {
       .slice(0, 6);
   }, [tickets]);
 
+  const avgCompletionPerUnit = useMemo(() => {
+    const unitMap = {};
+    tickets.forEach(t => {
+      if (t.status === 'Selesai' && t.tanggal_pengajuan && t.tanggal_selesai) {
+        const u = t.nama_unit || 'Lainnya';
+        if (!unitMap[u]) unitMap[u] = { total: 0, count: 0 };
+        const days = moment(t.tanggal_selesai).diff(moment(t.tanggal_pengajuan), 'days');
+        if (days >= 0) {
+          unitMap[u].total += days;
+          unitMap[u].count += 1;
+        }
+      }
+    });
+    return Object.entries(unitMap)
+      .map(([name, d]) => ({
+        name: name.length > 20 ? name.substring(0, 18) + '...' : name,
+        avg: +(d.total / d.count).toFixed(1),
+        count: d.count,
+      }))
+      .sort((a, b) => a.avg - b.avg)
+      .slice(0, 8);
+  }, [tickets]);
+
   const monthlyTrend = useMemo(() => {
     const months = [];
     for (let i = 5; i >= 0; i--) {
@@ -197,6 +220,33 @@ export default function Dashboard() {
           )}
         </div>
       </div>
+
+      {/* Avg Completion Time per Unit */}
+      {(isPimpinan || isPetugas) && avgCompletionPerUnit.length > 0 && (
+        <div className="bg-card rounded-xl border border-border p-5">
+          <h3 className="font-semibold text-sm mb-1 flex items-center gap-2">
+            <Award className="w-4 h-4 text-amber-500" />
+            Rata-rata Waktu Penyelesaian per Biro
+          </h3>
+          <p className="text-xs text-muted-foreground mb-4">Diurutkan dari tercepat ke terlama (dalam hari)</p>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={avgCompletionPerUnit} layout="vertical" margin={{ left: 10, right: 30 }}>
+              <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+              <XAxis type="number" className="text-xs" unit=" hr" allowDecimals={true} />
+              <YAxis dataKey="name" type="category" width={130} className="text-xs" tick={{ fontSize: 10 }} />
+              <Tooltip
+                contentStyle={{ borderRadius: '8px', border: '1px solid hsl(var(--border))', fontSize: '12px' }}
+                formatter={(value, name, props) => [`${value} hari (${props.payload.count} tiket)`, 'Rata-rata']}
+              />
+              <Bar dataKey="avg" radius={[0, 6, 6, 0]}>
+                {avgCompletionPerUnit.map((entry, i) => (
+                  <Cell key={`cell-${i}`} fill={i === 0 ? '#22c55e' : i === avgCompletionPerUnit.length - 1 ? '#ef4444' : 'hsl(var(--primary))'} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      )}
 
       {/* Priority Tickets */}
       <div className="bg-card rounded-xl border border-border overflow-hidden">
