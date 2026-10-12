@@ -1,5 +1,12 @@
 const isNode = typeof window === 'undefined';
 const windowObj = isNode ? { localStorage: new Map() } : window;
+
+// Cloudflare Workers serves the frontend as a static SPA, so there is no
+// Vite dev proxy to provide these values at runtime. Keep the deployed app
+// connected to its Base44 backend even when the deploy environment omits
+// VITE_BASE44_* variables; environment values still take precedence.
+const DEFAULT_APP_ID = '6a4cf45d09845365e2875d72';
+const DEFAULT_APP_BASE_URL = 'https://base44.app';
 const storage = windowObj.localStorage;
 
 const toSnakeCase = (str) => {
@@ -40,11 +47,11 @@ const getAppParams = () => {
 		storage.removeItem('token');
 	}
 	return {
-		appId: getAppParamValue("app_id", { defaultValue: import.meta.env.VITE_BASE44_APP_ID }),
+		appId: getAppParamValue("app_id", { defaultValue: import.meta.env.VITE_BASE44_APP_ID || DEFAULT_APP_ID }),
 		token: getAppParamValue("access_token", { removeFromUrl: true }),
 		fromUrl: getAppParamValue("from_url", { defaultValue: window.location.href }),
 		functionsVersion: getAppParamValue("functions_version", { defaultValue: import.meta.env.VITE_BASE44_FUNCTIONS_VERSION }),
-		appBaseUrl: getAppParamValue("app_base_url", { defaultValue: import.meta.env.VITE_BASE44_APP_BASE_URL }),
+		appBaseUrl: getAppParamValue("app_base_url", { defaultValue: import.meta.env.VITE_BASE44_APP_BASE_URL || DEFAULT_APP_BASE_URL }),
 	}
 }
 

@@ -131,8 +131,9 @@ export const AuthProvider = ({ children }) => {
   };
 
   const navigateToLogin = () => {
-    // Use the SDK's redirectToLogin method
-    base44.auth.redirectToLogin(window.location.href);
+    // The generic Base44 login page cannot identify an app served from a
+    // custom Cloudflare Worker origin. Use the app's own login route instead.
+    window.location.assign('/login');
   };
 
   return (
