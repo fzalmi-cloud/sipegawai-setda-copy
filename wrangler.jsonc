@@ -1,9 +1,18 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "sipegawai-setda-copy",
+  "main": "worker/index.js",
   "compatibility_date": "2026-10-01",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "sipegawai-db",
+      "database_id": "a1dbe298-5e78-4830-a672-48d0fce69fd4"
+    }
+  ],
   "assets": {
     "directory": "./dist",
+    "binding": "ASSETS",
     "not_found_handling": "single-page-application"
   }
 }
