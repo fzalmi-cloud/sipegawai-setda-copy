@@ -2,6 +2,9 @@
 .env
 .env.*
 
+# Migration exports may contain sensitive production data
+migration-export/
+
 # Logs
 /logs
 *.log
