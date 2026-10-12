@@ -1,0 +1,10 @@
+{
+  "name": "SIPEGAWAI SETDA",
+  "short_name": "SIPEGAWAI",
+  "description": "Sistem Pelayanan Kepegawaian Sekretariat Daerah Provinsi Sumatera Barat",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0f172a",
+  "lang": "id"
+}
